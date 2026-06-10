@@ -33,3 +33,9 @@ Date: 2026-06-10. Claims numbered per the implementation plan (Task 2).
 
 ## Amendments from validation trial (Task 6)
 - [#11 AMENDED, round 1] Colloquial adlibs ("the whole game" etc.) are casual-register leaning: in long-form, at most one per piece, used sparingly, never as a stock closer. (Rick: "these type of adlibs are generally reserved for more casual prose, and used sparingly.")
+
+## Amendments from first real draft (meta-repos §1, 2026-06-11)
+Rick: "it feels like it lacks my technical authority and reads a little more hyperbolic/american - there is potentially an overuse of commas." All three proposed amendments confirmed:
+- [NEW] Practitioner's seat — ground claims in named tools, mechanisms, and failure modes; rewrite anything an analyst who never did the work could have written.
+- [NEW] British dry, not American punchy — understate; no combat/sports/drama metaphors; facts carry the claim.
+- [NEW] Comma budget — more than two commas per sentence is a smell; full stops and semicolons first; deliberate enumerable lists exempt.
