@@ -26,19 +26,17 @@ LEAN: none yet. Stay neutral — earn trust before selling.
 TONE: punchy, present tense, concrete. One idea per sentence.
 -->
 
-## 1. The Binary We Inherited - Monorepo vs Polyrepo [~half page]
-<!--
-GOAL: Frame the monorepo-vs-polyrepo debate fairly and fast, so the reader trusts you're not strawmanning.
-BEATS:
-  1. Monorepo promise: one source of truth — discoverability, atomic commits, unified versioning, shared tooling, easy onboarding.
-  2. Polyrepo promise: autonomy — independent deploys, isolated CI/CD, clear ownership, fits microservices.
-  3. The punchline the debate's own veterans reached: at scale, BOTH must solve the same problems; topology matters less than culture + tooling. This disarms zealots on both sides.
-EVIDENCE (pick 1–2, don't overload):
-  • Matt Klein ("Monorepos: Please don't!") vs Adam Jacob ("Monorepo: please do!") as the two poles.
-  • Adam Jacob's concession is GOLD for your thesis: "there is no technical reason you must choose one or the other... You can, and will, make either layout work." → the benefit monorepos give is DEFAULT BEHAVIOR (visibility, shared responsibility), not magic.
-  • Klein's sharpest point: "at scale, a monorepo must solve every problem that a polyrepo must solve."
-KEY INSIGHT TO PLANT (you'll harvest it in §3): the real monorepo prize is *default behaviors* — discovery + shared worldview — not the single git history.
--->
+## 1. The Binary We Inherited — Monorepo vs Polyrepo
+
+Every engineering organisation has had this argument. Monorepo or polyrepo: every line of code in one repository, or a repository per service. It resurfaces in every RFC thread and architecture review; it never quite gets settled.
+
+The monorepo promise is one source of truth. One clone gives you the whole estate. You can grep for every consumer of the API you're about to change; a breaking change lands in the same commit as the fixes to everything it breaks. Versioning is unified. Tooling is shared. Onboarding is `git clone` and you're done.
+
+The polyrepo promise is autonomy. Each team owns its repository and everything attached to it: the pipeline, the deploy cadence, the on-call rota for what it ships. Boundaries are enforced by git itself rather than by convention. If you adopted microservices in the last decade this is the topology you defaulted into — often without making a deliberate choice at all.
+
+The veterans of this debate ended up closer than their titles suggest. Matt Klein — creator of Envoy, and author of the canonical case against monorepos — observes that at scale "a monorepo must solve every problem that a polyrepo must solve".[^klein] Adam Jacob, who co-founded Chef and argued the opposite position, concedes "You can, and will, make either layout work."[^jacob] Opposite positions; the same conclusion. **Topology is not the prize. Tooling and defaults are.**
+
+What a monorepo actually buys you is default behaviour. The engineer changing a shared library sees its consumers because they sit in the same tree. New starters absorb the shape of the system from the directory layout. Nobody maintains a wiki page mapping service to repository because there is nothing to map. None of that is git mechanics; it is what the layout makes easy. Hold that thought — the rest of this paper is about getting those defaults without the migration.
 
 ## 2. Microservices Hell [~half to ¾ page]
 <!--
@@ -76,6 +74,249 @@ LEAN: light, first touch. You can note this is a live, active category in 2026 (
 -->
 
 ## 4. AI Is the Catalyst [~¾ page]
+
+<!--
+WHITEPAPER SCAFFOLD — SECTION 4: "AI as the Catalyst"
+=====================================================
+This is a WRITING GUIDE, not finished prose. Same convention as the main scaffold:
+  • GOAL — what this section must achieve for the reader
+  • BEATS — the narrative/argument beats to hit, in order
+  • EVIDENCE — specific papers/quotes/stats to anchor each beat (paper-native, with arXiv IDs)
+  • LEAN — where/how hard to lean toward metastack
+HTML comments are notes to you and will not render. Delete them as you write.
+
+POSITION IN DOCUMENT: this is the "why now" section — the catalyst beat that turns the
+meta-repo from a decade-old nice-to-have into a present-tense necessity. It comes AFTER
+the meta-repo concept has been introduced (§3) and BEFORE the metastack landing (§5).
+
+NARRATIVE SPINE (one line): agents need structure → polyrepos withhold it → context
+windows + weak retrieval prove the problem → structure (graphs / bounded contexts) is the
+fix → a meta-repo is the pragmatic way to deliver that structure without a monorepo migration.
+
+CITATION HONESTY NOTE: none of these papers say "use a meta-repo." They establish the
+PREMISES (agents need structural context; polyrepo scale breaks it). The meta-repo
+conclusion is your synthesis — keep the "this suggests / it follows" framing on the
+inferential joins, exactly as discussed.
+-->
+
+# 4. AI as the Catalyst
+<!-- Title options to riff on:
+     • "AI as the Catalyst: Why Now"
+     • "The Agent Changes the Math"
+     • "What the Agent Needs"
+     Keep it short; the section does the work. -->
+
+## [Opening — the inflection point | ~half page]
+<!--
+GOAL: Establish that something genuinely changed in 2024–2026, and that the change is what
+makes this whole document urgent rather than academic.
+BEATS:
+  1. The new actor arrives: coding agents (Claude Code, Cursor, Copilot, Cline) are now doing
+     real work on real enterprise codebases — not autocomplete, but multi-file, multi-service tasks.
+  2. The reframe that powers the whole section: the polyrepo pains from §2 were always there,
+     but humans absorbed them with intuition, memory, and hallway knowledge. Agents can't.
+     An agent has no tribal knowledge and no memory of last sprint — it sees only what the
+     structure makes visible. So AI doesn't CREATE the problem; it REMOVES our ability to paper over it.
+  3. Thesis of the section: agents need explicit structure, and the repo topology is where that
+     structure lives or dies.
+LEAN: none yet.
+TONE: present tense, slightly urgent. This is the "wake up" beat.
+-->
+
+## [Problem framing — what agents actually need is structure, not tokens | ~¾ page]
+<!--
+This is the analytical heart. Three evidence beats, each a short step. Resist the urge to
+dump all four papers at once — let them build.
+-->
+
+### Beat 1 — Context windows are a hard, practical ceiling
+<!--
+GOAL: Kill the "but context windows are huge now" objection before it's raised.
+ARGUMENT: real repos dwarf any context window, so agents MUST select/truncate — and they
+visibly do, mid-task, in published work.
+EVIDENCE:
+  • The scale fact: the average of 500 real-world repositories is ~1.1 million tokens — larger
+    than mainstream context windows, so whole-repo loading is not an option. (Reported in Yellin 2024.)
+  • The smoking gun — agents truncating context to fit, in a real microservice-generation system:
+    Yellin (2024): the system removes parts of error messages "not useful to debug the issue,"
+    and for some models must "further limit the size of the error messages to fit into the
+    context window." Paraphrase this; one short quote max if you want the texture.
+  • Reinforce: Tao et al. (2024) name the three RLCG failure drivers explicitly — context-window
+    limits, lack of structural understanding, and missing project-specific knowledge.
+TAKEAWAY LINE (your voice): more tokens is not the fix; the agent will always be choosing what to see.
+PAPERS: Yellin 2024 (2508.20119); Tao et al. 2024 (2510.04905).
+-->
+
+### Beat 2 — The differentiator is structure, not volume
+<!--
+GOAL: Pivot from "tokens are scarce" to "structure is what actually drives quality." This is
+the load-bearing beat for the meta-repo argument.
+ARGUMENT: structure-aware retrieval beats flat/vector retrieval for exactly the tasks
+enterprises care about — cross-file, cross-service, global-consistency changes.
+EVIDENCE:
+  • Tao et al. (2024): vector methods are efficient but "may lack structural understanding,"
+    whereas graph-based retrieval "excels at capturing architectural and dependency
+    relationships," suited to "global consistency or cross-file reasoning." (One quote max — paraphrase the rest.)
+  • Quantified payoff: Athale & Vaddina (2025) represent the repo as a knowledge graph capturing
+    structural/relational info and report >10% improvement on project-level generation. Structure,
+    not extra tokens, moved the metric.
+TAKEAWAY LINE (your voice): give the agent the dependency graph and it reasons; make it guess
+from similarity and it hallucinates. The repository's structure IS context.
+PAPERS: Tao et al. 2024 (2510.04905); Athale & Vaddina 2025 (2505.14394).
+-->
+
+### Beat 3 — Agents reason iteratively, hop by hop, across dependencies
+<!--
+GOAL: Show WHY repo boundaries specifically hurt — because reasoning is multi-hop, and every
+hop that crosses a git/repo wall loses signal and burns budget.
+ARGUMENT: agentic reasoning is navigate → trace → gather → repeat. That loop assumes the
+dependency chain is traversable. Polyrepo walls break the chain.
+EVIDENCE:
+  • Ugare & Chandra (2026, Meta) define "agentic code reasoning": the agent's ability to
+    "navigate files, trace dependencies, and gather context iteratively," essential for tasks
+    "where relevant context spans multiple files." Emphasise iteratively + spans multiple files.
+  • Optional reinforcement (use only if you want a third corroborating source): Adnan et al.
+    (2026) found agents generate functionally correct microservices ~65% of the time when
+    integrated INTO an existing system — i.e., performance is conditional on surrounding context
+    being available. (See note in EVIDENCE LEDGER about citing this carefully.)
+TAKEAWAY LINE (your voice): the question isn't whether the agent is smart enough; it's whether
+the path it must walk is intact. Repo walls cut the path.
+PAPERS: Ugare & Chandra 2026 (2603.01896); optional Adnan et al. 2026 (2603.09004).
+-->
+
+## [Bridge — where polyrepo microservices fail the agent | ~half page]
+<!--
+GOAL: Translate the three abstract beats into the concrete enterprise situation from §2, so
+the reader feels the failure rather than reads about it.
+BEATS:
+  1. Restate the polyrepo reality in agent-hostile terms: each service is structurally isolated
+     (own repo), informationally isolated (own team / tribal knowledge), and its dependencies are
+     implicit (message contracts, events, API calls — not anything an agent can SEE from one repo).
+  2. Walk one concrete scenario end-to-end. Suggested: add a field to a domain object that flows
+     through an event bus to two downstream services. The agent must (a) discover which services
+     are affected — but that's tribal knowledge; (b) pull three separate git histories;
+     (c) reason about consistency with no shared structural anchor; (d) avoid deepening the
+     big-ball-of-mud tangle from §2. It is working blind on every one of those.
+  3. Name the through-line back to earlier sections: the SAME missing thing hurts humans
+     (onboarding, §"microservices hell") and agents (reasoning) — absent, explicit boundaries.
+LEAN: none. The pain sells.
+CALLBACK: explicitly tie to the big-ball-of-mud / distributed-monolith material so §4 reinforces §2
+rather than repeating it.
+-->
+
+## [The resolution — the meta-repo gives the agent what it needs | ~¾ page]
+<!--
+GOAL: Land the synthesis. This is the section's payoff and the cleanest statement of the
+whole document's thesis through the AI lens.
+BEATS (the meta-repo, scoped to a bounded context, does three things):
+  1. Makes the dependency graph EXPLICIT and structural. Instead of the agent inferring service
+     relationships by analysis/luck, the workspace declares them (manifest / workspace file /
+     submodules): "these services constitute this bounded context." This is the hand-built version
+     of the knowledge graph that moved the metric in Beat 2 — available to ANY agent, no special API.
+  2. Cuts context-window friction by scoping. An agent working Order Processing loads Order's
+     services — not Payments, not Logistics. Less irrelevant code, less truncation (Beat 1), and the
+     bounded context is a principled scope line, not an arbitrary one (callback to the DDD section).
+  3. Keeps iterative reasoning INSIDE one coherent workspace. Tracing Order Service → Order Events →
+     Fulfilment is traversal within a single tree, not jumps across unrelated git repos (Beat 3).
+  4. THE "WHY NOW" SENTENCE: monorepos answered a human-scale discovery problem; the meta-repo
+     answers an agent-scale reasoning problem. The agent is the reason a decade-old pattern is
+     suddenly urgent. (This is the line the whole section is built to earn.)
+HONESTY BEAT (keep, don't skip):
+  • The papers establish that agents need structural, traversable context — they do NOT prescribe
+    meta-repos. State that the meta-repo is the pragmatic delivery mechanism you're proposing, an
+    inference from the evidence, not a finding of it.
+  • A meta-repo gives VISIBILITY of boundaries, not ENFORCEMENT (the visibility-vs-enforcement
+    line from earlier). It helps the agent see and respect the bounded context; it doesn't stop
+    bad cross-context calls at the Git layer. Phrase accordingly.
+LEAN: medium → this is where metastack becomes the natural "so how do I get this" — but hold the
+actual pitch for §5; here just establish that lightweight tooling can declare these workspaces.
+-->
+
+## [Corroboration — structured context delivers measured gains | ~quarter page, optional]
+<!--
+GOAL: Pre-empt "is any of this real in practice?" with an industry data point — clearly labelled
+as vendor-sourced so you keep the credibility you built with the papers.
+BEATS:
+  1. When dependency relationships were exposed to agents as STRUCTURED context (e.g. via MCP),
+     measured agent quality rose sharply — Augment's Context Engine reported a large Claude Code
+     improvement when the cross-service dependency graph was made explicit.
+  2. The interpretation that matters: this is the SAME mechanism as Beat 2 — structure over
+     similarity — now observed in a production-grade setting. A meta-repo pre-structures that graph
+     at the filesystem level.
+DISCLOSURE: label this explicitly as a tooling-vendor claim (commercial interest); the arXiv papers
+are the rigorous anchors, this is the directional corroboration. (Mirrors the source-honesty note
+from the main research.)
+LEAN: light.
+-->
+
+## [Close of section — the choice | ~quarter page]
+<!--
+GOAL: Hand off to §5 by sharpening the decision the reader now faces.
+BEATS:
+  1. Two doors: (a) migrate to a monorepo to give agents structure — high cost, risk, CI/CD +
+     deployment + governance rework (callback to §2/§5 cost material); or (b) adopt meta-repos
+     scoped to bounded contexts — lightweight, additive, respects existing topology and tooling,
+     reversible.
+  2. The teams most stuck are precisely the enterprises that went all-in on microservices/polyrepo
+     in 2015–2020 and now want agent-assisted delivery. They don't need to undo that bet.
+  3. One-sentence bridge into §5: modern meta-repo tooling is being built for exactly this moment.
+TONE: confident, forward-leaning, short. Don't pitch metastack yet — set the table for it.
+-->
+
+<!--
+========================  EVIDENCE LEDGER (paper-native citations)  ========================
+Use these as your reference list / footnotes. All verified via arXiv. Keep quotes ≤15 words,
+one per source, paraphrase everything else (copyright + credibility).
+
+[1] Yellin, D. M. (2024/2025). "LLM Agents for Generating Microservice-based Applications:
+    How Complex is Your Specification?" arXiv:2508.20119 [cs.SE]. https://arxiv.org/abs/2508.20119
+    USE FOR: context-window ceiling (Beat 1); the ~1.1M-token average-repo figure; agents
+    truncating error traces to fit the window. Single author (IBM). v2 dated 26 Oct 2025.
+
+[2] Tao, Y., Qin, Y., & Liu, Y. (2025). "Retrieval-Augmented Code Generation: A Survey with
+    Focus on Repository-Level Approaches." arXiv:2510.04905 [cs.SE]. https://arxiv.org/abs/2510.04905
+    (Carnegie Mellon / CUHK / SUSTech; CC BY 4.0; submitted 6 Oct 2025.)
+    USE FOR: structure-vs-vector retrieval (Beat 2); the three RLCG failure drivers
+    (context-window limits, lack of structural understanding, missing project knowledge).
+    NOTE: this is the strongest single citation for the section — a survey, so it carries weight.
+
+[3] Athale, M., & Vaddina, V. (2025). "Knowledge Graph Based Repository-Level Code Generation."
+    arXiv:2505.14394 [cs.SE]. https://arxiv.org/abs/2505.14394 (Quantiphi; presented at
+    ICSE 2025 / LLM4Code 2025.)
+    USE FOR: the quantified >10% improvement from graph/structure-aware retrieval (Beat 2 payoff).
+
+[4] Ugare, S., & Chandra, S. (2026). "Agentic Code Reasoning." arXiv:2603.01896 [cs.SE].
+    https://arxiv.org/abs/2603.01896 (Meta.)
+    USE FOR: the definition of agentic code reasoning as iterative navigate/trace/gather across
+    multiple files (Beat 3). Good provenance (Meta) for an enterprise-leadership audience.
+
+[5] (OPTIONAL) Adnan, B., et al. (2026). "Can AI Agents Generate Microservices? How Far are We?"
+    arXiv:2603.09004 [cs.SE]. https://arxiv.org/abs/2603.09004
+    USE FOR: corroborating that agent success is CONTEXT-CONDITIONAL — ~65% functional correctness
+    when integrating into an existing system, across 144 generations / 3 agents / 4 projects.
+    CITE CAREFULLY: the 65% figure is scenario-specific; state the conditions, don't generalise it.
+
+NON-PAPER / VENDOR (label as such if used):
+[6] Augment Code — "Context Engine" / MCP results (Feb 2026): large reported Claude Code quality
+    improvement when a cross-service dependency graph is exposed as structured context.
+    DISCLOSURE: tooling vendor, commercial interest. Directional corroboration only.
+
+QUOTE-DISCIPLINE REMINDER: across the whole section, ≤1 short quote per source, under 15 words,
+in quotation marks with attribution. Everything else in your own words. Several of these sources
+are paraphrase-only by the time you've used your one quote elsewhere — track it.
+============================================================================================
+
+========================  WHAT THIS SECTION DELIBERATELY DOESN'T CLAIM  ====================
+(Worth a one-line footnote or a sentence in the honesty beat, to stay bulletproof.)
+  • It does NOT claim any paper recommends meta-repos. They establish need for structural,
+    traversable context; the meta-repo is your proposed delivery mechanism.
+  • It does NOT claim meta-repos ENFORCE boundaries — only that they make them VISIBLE/traversable.
+  • It does NOT claim the AI angle is established consensus — it's the document's novel synthesis,
+    combining agent-context constraints (papers) with bounded-context workspaces (your thesis).
+    That's the strongest candidate for your original contribution — frame it as a reasoned argument,
+    confidently, but as argument.
+============================================================================================
+-->
 <!--
 GOAL: This is WHY NOW. The meta-repo was a nice-to-have for a decade; agentic AI turns it into a competitive necessity. This is your strongest contemporary argument — give it room.
 BEATS:
@@ -139,3 +380,7 @@ REGISTER REMINDER: every section should give a leader a skimmable claim (bold se
 AND a practitioner a concrete mechanism (the actual command, file, or workflow). Dual-audience throughout.
 =============================================================================
 -->
+
+<!-- FOOTNOTE BLOCK — all citations live here as GFM footnotes; no inline links in the prose. -->
+[^klein]: Klein, M. "Monorepos: Please don't!" https://medium.com/@mattklein123/monorepos-please-dont-e9a279be011b
+[^jacob]: Jacob, A. "Monorepo: please do!" https://medium.com/@adamhjk/monorepo-please-do-3657e08a4b70

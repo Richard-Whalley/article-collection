@@ -18,6 +18,7 @@ These are established in the existing documents and the scaffold's own instructi
 - **British English** spelling ("optimisation", "flavours", "centre").
 - **Dual register**: every section should give a leader a skimmable claim (bold sentence or pull quote) and a practitioner a concrete mechanism (command, file, workflow).
 - **Quote discipline** (meta-repos.md): at most one short quote per source, under 15 words, in quotation marks with attribution; paraphrase everything else. Track quote usage across the document.
+- **Citations** (meta-repos.md): no inline links in the prose — all citations are GFM footnotes (`[^name]`) defined in the footnote block at the end of the document.
 - **Citation honesty**: the cited papers establish premises, not the meta-repo conclusion — keep "this suggests / it follows" framing on inferential joins, and label vendor-sourced claims as such (commercial interest). Honesty beats (what the argument does NOT claim) are deliberate and must not be cut.
 - **Lean discipline** (meta-repos.md): the document soft-lands on metastack. Sections marked LEAN: none must stay neutral; the pitch belongs only in §5.
 - Target length for the meta-repos whitepaper: ~3–4 pages, with per-section budgets noted in the scaffold.
