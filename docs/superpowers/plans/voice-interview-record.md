@@ -30,3 +30,6 @@ Date: 2026-06-10. Claims numbered per the implementation plan (Task 2).
 - [#18] CONFIRMED — never end a section on a bullet list (merged with #19)
 - [#19] CONFIRMED — no bullet-walls; argument lives in prose
 - [NEW] none volunteered — additional-nevers prompt offered via Other; no additions given. Maintenance loop will accumulate future ones.
+
+## Amendments from validation trial (Task 6)
+- [#11 AMENDED, round 1] Colloquial adlibs ("the whole game" etc.) are casual-register leaning: in long-form, at most one per piece, used sparingly, never as a stock closer. (Rick: "these type of adlibs are generally reserved for more casual prose, and used sparingly.")
