@@ -39,3 +39,11 @@ Rick: "it feels like it lacks my technical authority and reads a little more hyp
 - [NEW] Practitioner's seat — ground claims in named tools, mechanisms, and failure modes; rewrite anything an analyst who never did the work could have written.
 - [NEW] British dry, not American punchy — understate; no combat/sports/drama metaphors; facts carry the claim.
 - [NEW] Comma budget — more than two commas per sentence is a smell; full stops and semicolons first; deliberate enumerable lists exempt.
+
+## Amendments from meta-repos §3 draft (2026-09-23)
+Rick, on the § section symbol in prose: "I don't like this character, I wouldn't use it." Confirmed:
+- [NEW] Cross-references in prose are spoken, never typographic — "earlier", "the next section", "back in the monorepo section". No § symbol, no "see §2".
+
+## Amendments from AWS talk script pass (2026-09-27)
+Rick, on a clause appended to the FS proof-of-value fact ("which is the result I'd point to before the timeline"): "lets drop that editorialisation, I think we just let the fact they bought it sit and let the audience connect the dots." Confirmed:
+- [NEW] Glossing the fact — when a fact makes the point, stop there; never follow it with a clause explaining what it proves. Before/after pair added to anti-patterns.md.
