@@ -1,0 +1,9 @@
+As someone that’s been dabbling with AI for a long time, I’ve yo-yoed between being an AI sceptic and an AI evangelist. I was a co-pilot technical preview user way back in October 2021, and it was amazing how good the suggestions were. However up until very recently I feel like it was actually capable or accelerating my software development lifecycle, being that I work on complex niche problems as my day to day. But that’s changed, the models themselves have gotten better but that’s not the real game changer.
+
+It’s MCP. It’s spec driven prompting. It’s context engineering. It’s custom rulesets. It’s agentic workflows.
+
+These recent technologies and methodologies can be combined to make a very competent pair programmer and in the hands of a skilled engineer you can build complex solutions at an unholy pace.
+
+The problem at the moment is, it’s not as simple as giving your engineers access to Amazon Q, or Claude code or Gemini CLI and 3x their output. Rules need to be crafted to fit your organisation, to ensure the standards your business want to uphold are met, to choose technologies that complement your existing tech stack.
+
+Every organisation that has software engineers  should be moving to towards code generation, and they should be considering having prompt libraries, rulesets, standardised agent configurations for MCP.

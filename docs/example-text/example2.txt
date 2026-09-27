@@ -1,0 +1,72 @@
+If you've read my piece on harness engineering, you'll know I think the architecture around the model matters at least as much as the model itself. Skills are the single cheapest, highest-leverage piece of that architecture — and they're the part most people still haven't touched.
+
+A skill is, at its simplest, a markdown file. A bit of YAML frontmatter describes when Claude should reach for it, and the body describes what to do when it does. That's it. No plugin runtime, no SDK, no compilation step. You write a markdown file, drop it in the right directory, and every future session inherits that behaviour.
+
+That sounds almost too boring to be interesting, and for a while I dismissed it. I was wrong. Skills turn out to be the mechanism by which you encode your team's taste — coding standards, commit conventions, review checklists, incident playbooks — into something the agent will actually follow without being nagged. They're how you go from "Claude writes fine code" to "Claude writes code the way we write code, every time."
+
+This post is a 101: what a skill looks like, where they live, how they fire, and the handful of practices that separate a skill you use once from one that earns its place in your workflow forever.
+
+A few things to notice, because they're the whole game:
+
+The name is an identifier, the description is the trigger. When a user message arrives, Claude scans the descriptions of all available skills and decides which (if any) to invoke. That means the description is not documentation for humans — it's a classifier prompt. If your skill never fires when you expect it to, the description is almost always why. Lead with the concrete situations and phrases that should activate it ("Use when…", "…or when the user asks to X").
+
+The body is an instruction, not an explanation. Write it in the imperative, addressed to the agent. Number the steps. Be specific about the commands to run and the rules to follow. Skills that read like blog posts ("You might want to consider…") get ignored in practice; skills that read like a runbook get followed.
+
+There's no magic. The skill body is just injected into the conversation when the skill fires. Everything you know about prompting — be concrete, give examples, name the failure modes — applies directly.
+
+Progressive Disclosure: The Thing Most People Miss
+The example above is small enough to live entirely in SKILL.md. But real skills grow. A code review skill might have a twelve-point checklist, a set of language-specific rules, and a reference document on your team's security posture. Dump all of that into one file and you end up with a 2,000-line wall of text that bloats every session, whether the skill fires or not.
+
+The fix is progressive disclosure: the SKILL.md stays short and load-bearing, and everything else lives in sibling files that Claude reads only when it needs them.
+
+The SKILL.md loads on trigger. It knows about the reference files and tells Claude when to read them: "For TypeScript changes, first read references/typescript-rules.md." Those references stay on disk, costing zero tokens, until the agent actually needs them.
+
+This is the same pattern Anthropic's own harness uses: short descriptions in context, full definitions lazy-loaded on demand. It's what lets a team accumulate dozens of skills without every session paying for all of them.
+
+If you take one thing away from this post, take this one. Progressive disclosure is the difference between a skill system that compounds and one that collapses under its own weight.
+
+Where Skills Live: The Hierarchy
+Skills resolve in a predictable order, and understanding the hierarchy is how you avoid the two classic failure modes: "the skill I wrote at home isn't available at work" and "my teammate can't reproduce what I'm seeing."
+
+Personal skills (~/.claude/skills/) follow you between projects. They're the right home for things that reflect your taste rather than any given codebase — how you like commits written, how you want bugs investigated, which tools you reach for first.
+
+Project skills (.claude/skills/ inside the repo) are where the real leverage is, and where most teams under-invest. Because they're checked into git, they're reviewed like code, versioned like code, and inherited by every engineer (and every agent) that touches the repo. A new hire clones the project and immediately has access to the same conventions as the most senior person on the team. So does every Claude session they start. This is institutional memory encoded as a file tree, and it's essentially free.
+
+Plugin skills come from skill packs you install — superpowers, skill-creator, domain-specific collections. Treat these the way you'd treat a library dependency: useful, but audit what's in them and be deliberate about which ones you pull in. The descriptions all compete for the same trigger attention.
+
+When a user message arrives, Claude considers skills from all three sources together. More specific skills (project > personal > plugin) should generally win, but that's decided by the descriptions, not the location. Which brings us to practices.
+
+Best Practices
+Skills are easy to write and hard to write well. A handful of rules cover most of the gap.
+
+Keep SKILL.md under ~500 lines. If it's longer, you're either missing progressive disclosure (split references out) or the skill is doing too many things (split it into multiple skills). Long skills are both more expensive and, paradoxically, less likely to be followed — the agent's attention degrades over long instructions the same way yours does.
+
+One skill, one job. A skill called git-stuff that covers commits, branching, rebasing, and PR descriptions will fire inconsistently and be edited by everyone into incoherence. Four skills named for the four jobs will fire precisely and stay maintainable.
+
+Lead the description with trigger phrases. "Use when creating a commit…" is a better opening than "A skill for managing git commits." You're writing classifier input, not a product description. Include the exact user phrases ("when the user says 'ship it'", "before running migrations") when they exist.
+
+Write the body as a runbook. Numbered steps. Imperative voice. Concrete commands. Explicit "do not" clauses for the failure modes you've already seen. Skills inherit all the rules of good prompting — they just live in a file instead of a chat window.
+
+Abstract templates out of the prose. If your skill tells Claude to write a PR description in a particular format, put the format in templates/pr-description.md and reference it. Templates in the body tend to get paraphrased; templates in files get quoted.
+
+Watch for the two smells. Skill never fires → fix the description, usually by adding explicit trigger phrases. Skill fires but isn't followed → shorten it, split it, or make the steps more concrete. Both are symptoms of the same underlying issue: the skill is too abstract for the job it's doing.
+
+skill-creator: Writing Skills About Writing Skills
+Once you've written a handful of skills by hand, you'll notice two things. First, the quality varies wildly depending on how much care you took with the description. Second, you have no real way to tell whether a skill is actually firing when it should — it either feels like it's working or it doesn't.
+
+That's what skill-creator is for. It's a skill (yes) that guides you through authoring other skills: it interviews you about the job the skill needs to do, drafts the frontmatter and body, and — crucially — helps you write evals.
+
+An eval for a skill is a set of user messages that should trigger it and a set that shouldn't. You run the suite, measure how often the skill fires correctly, and tune the description until the numbers look right. It sounds heavy for a markdown file, but it's the difference between "I think this skill works" and "this skill fires on 95% of commit-related requests and 0% of everything else." Once you care about reliability — and you will, as soon as you have more than five or six skills competing for attention — you want the evals.
+
+skill-creator also nudges you toward the practices above: it'll tell you when your description is too vague, when your body is too long, when you should split a skill into two. Think of it as a linter for skills, with the bonus that the linter is itself a skill, which is the kind of recursion that makes this whole ecosystem feel alive.
+
+Why This Matters
+I opened with harness engineering, and I'll close there too. The harness you choose is a long commitment — teams build habits, processes, and plumbing around whichever tool they pick, and that investment compounds every month. Most of that investment is hard to move. Sub-agent orchestration patterns, MCP server configurations, context management choices — they're all tightly coupled to the specific harness they were built for.
+
+Skills are the exception. A SKILL.md is just markdown. It doesn't depend on a particular runtime, a particular model version, or a particular plugin framework. If Claude Code disappeared tomorrow and you moved to a different harness, your skills would move with you — the format might change, but the accumulated knowledge of how your team likes commits written and how your team likes bugs investigated is right there in plain text.
+
+That makes skills the most durable piece of harness investment you can make, and the one that pays back fastest. They're also the most human piece: a skill is just a write-up of how a good engineer on your team would do something, in a format the agent happens to read. Writing them well is mostly a matter of being specific about things you already know.
+
+Start with one. Semantic commits is a good first skill — small, self-contained, and the feedback loop is immediate. Get it firing reliably, notice how much mental overhead it removes, and then write the next one. Six months later you'll have a .claude/skills/ directory that feels less like configuration and more like a distilled version of how your team actually works.
+
+That's the thing worth building.

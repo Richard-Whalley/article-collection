@@ -1,0 +1,13 @@
+I’ve mentored people through early career stages before; but we are in a very different landscape now. Getting a start in tech is never been as complex or difficult as it is now. The messaging is so confusing, ai has replace the junior developer, coding isn’t a valuable skills rhetorics certainly don’t help.
+
+I’ve had two occasions in the past week or so where people early in their career have asked me of advice.
+
+One of them was an excellent security engineer that refocused on full stack development, the other a very nervous apprentice that took the best part of a day to work up the courage to talk to me (I’m very approachable honestly 🙏). The theme was simple though, how do I build my skills in meaningful way.
+
+The answer is actually alarmingly simple. It’s building something. The key is to pick something that seems on the surface innocuous, that you could build the core functionality quickly, but has room to flex your tech know how. If you’re trying to learn a new technology you don’t need to be wrestling with a complex domain.
+
+My example for this would be something like a list app. Wait. Bear with me. I know the to-do app tutorial is played out. But this is where it’s different. Don’t use tutorials, because what you’re trying to build is your system design skills.
+
+My personal approach to this is a system design speed run tm, I don’t know if this is a real approach with another
+
+The idea of taking a concept at a high level, and being able to break it down will always be valuable. Even if LLMs get so good we never even think about code anymore, the ability to think in systems decompose bigger ideas will still be useful for creating prompts or reviewing the tasks the agents will do.

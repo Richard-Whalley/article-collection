@@ -1,0 +1,44 @@
+So, the goal is:
+Receive subscription provisioning, up-to-date, b-call, e-call, and PSAP phone numbers so I can always get the entitlements and help I need
+
+Our responsibility is to ensure every vehicle is configured to provide the correct connected experiences for our customers.
+
+And we deliver this with 2 major components within the config factory domain. Phonebook and Config Builder.
+
+Let’s look at Phonebook first.
+
+What is it? Phonebook aims to be the source of truth for the E-Call, B-Call and PSAP phone numbers.
+
+When is it used? Fundamentally, it’s there to ensure that vehicles always have access to the right numbers, exactly when they need it most, in an emergency or breakdown situation.
+
+We ensure this happens by a layered approach.
+
+Firstly, we master the data that is passed to LGE, our ECU partner, ensuring that the ECU’s leave the factory with EU compliant set of ECalls numbers.
+
+Secondly, we provision the most appropriate numbers based on the brand and target market during the car’s build process.
+
+Then, finally, when it’s in the customer’s hands, in an E-Call or B-Call situation, the car will request the most up-to-date number from our API before dialling.
+
+So, how is this different from how we used to do it.
+The main difference is in the ergonomics, and the flexibility.
+
+When I say ergonomics, I mean the ease with which we can make changes; rather than relying on engineers to change code, trigger builds, and share outputs with third parties, it’s a simple API trigger, which, in the future, we’re looking to work with OP’s to design an interface for them so that they can make changes without a dependency on engineering.
+
+In terms of flexibility, we can take it much more granular; at the moment, numbers can differ depending on brand and market, but we can add other differentiators, such as the customer's preferred language.
+
+In addition, the phonebook can be updated anytime during the vehicle's lifecycle, from build to resale into a different market.
+
+So, we’ve got a phonebook, how do we get it onto a car?
+
+The answer is provisioning; provisioning means different things to different people, so I’ll clarify what we mean here.
+
+When Sumac talks about provisioning, we mean preparing the ECU to enable high-level features like ECall or SVT. We do this by generating and sending LCF files from VCDP to the ECUs themselves on the Vehicle. As of this PI, we support the TCUA and VCM ECUs.
+
+When is it used? Any of the journeys that touch config, examples of this would be during the initial build of the car, when a user first binds, changes of subscription, the car getting sold into a different market, all throughout the lifecycle of the car, we need to make tweaks and updates to the configurations.
+
+How is it different?
+There is no wireless car involvement, meaning we can align closer with onboard and operations—more control, no more black boxes.
+Event-driven, it responds to events in the vehicle’s lifecycle to ensure the best possible configuration is always on the car.
+
+What’s been implemented so far?
+The foundations for provisioning are built. We can push the config to the car, and the car can request a config update from VCDP. This a significant milestone and gives us the building blocks to react to vehicle lifecycle events and update the configuration accordingly. We have the ‘default’ configs for the market regions of NAS, China, Rus, and ROW (including Europe), which will be pushed on vehicle build, and we’re actively working to support the market-specific configs being pushed at PDI.
